@@ -64,7 +64,7 @@ def get_seller_profile(
         .first()
     )
 
-
+# comment 
 def upgrade_user_to_seller(
     db: Session,
     user: models.User,
