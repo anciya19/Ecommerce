@@ -12,7 +12,8 @@ from database import (
 from routers import (
     auth,
     products,
-    sellers
+    sellers,
+    chatbot
 )
 
 
@@ -66,6 +67,10 @@ app.add_middleware(
 
 app.include_router(
     auth.router
+)
+
+app.include_router(
+    chatbot.router
 )
 
 app.include_router(

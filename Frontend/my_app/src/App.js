@@ -21,6 +21,9 @@ import AdminRoute
 import SellerRoute
   from "./components/SellerRoute";
 
+import Chatbot
+  from "./components/Chatbot";
+
 
 import Login
   from "./pages/Login";
@@ -46,7 +49,6 @@ import Products
 import Cart
   from "./pages/Cart";
 
-
 import "./App.css";
 
 
@@ -58,12 +60,11 @@ function App() {
 
       <AuthProvider>
 
+
         <Routes>
 
 
-          {/* =============================
-              LOGIN
-          ============================== */}
+          {/* LOGIN */}
 
           <Route
             path="/login"
@@ -73,9 +74,7 @@ function App() {
           />
 
 
-          {/* =============================
-              REGISTER
-          ============================== */}
+          {/* REGISTER */}
 
           <Route
             path="/register"
@@ -85,9 +84,7 @@ function App() {
           />
 
 
-          {/* =============================
-              HOME
-          ============================== */}
+          {/* HOME */}
 
           <Route
             path="/home"
@@ -103,9 +100,7 @@ function App() {
           />
 
 
-          {/* =============================
-              ALL PRODUCTS
-          ============================== */}
+          {/* ALL PRODUCTS */}
 
           <Route
             path="/products"
@@ -121,9 +116,7 @@ function App() {
           />
 
 
-          {/* =============================
-              CATEGORY PRODUCTS
-          ============================== */}
+          {/* CATEGORY */}
 
           <Route
             path="/products/category/:category"
@@ -139,9 +132,7 @@ function App() {
           />
 
 
-          {/* =============================
-              CATEGORY + SUBCATEGORY
-          ============================== */}
+          {/* CATEGORY + SUBCATEGORY */}
 
           <Route
             path="/products/category/:category/:subcategory"
@@ -157,9 +148,7 @@ function App() {
           />
 
 
-          {/* =============================
-              DEALS
-          ============================== */}
+          {/* DEALS */}
 
           <Route
             path="/products/deals"
@@ -175,9 +164,7 @@ function App() {
           />
 
 
-          {/* =============================
-              CART
-          ============================== */}
+          {/* CART */}
 
           <Route
             path="/cart"
@@ -193,9 +180,8 @@ function App() {
           />
 
 
-          {/* =============================
-              ADMIN
-          ============================== */}
+
+          {/* ADMIN */}
 
           <Route
             path="/admin"
@@ -211,9 +197,7 @@ function App() {
           />
 
 
-          {/* =============================
-              BECOME SELLER
-          ============================== */}
+          {/* BECOME SELLER */}
 
           <Route
             path="/seller/register"
@@ -229,9 +213,7 @@ function App() {
           />
 
 
-          {/* =============================
-              SELLER DASHBOARD
-          ============================== */}
+          {/* SELLER DASHBOARD */}
 
           <Route
             path="/seller/dashboard"
@@ -247,9 +229,7 @@ function App() {
           />
 
 
-          {/* =============================
-              DEFAULT
-          ============================== */}
+          {/* DEFAULT */}
 
           <Route
             path="/"
@@ -264,9 +244,7 @@ function App() {
           />
 
 
-          {/* =============================
-              UNKNOWN
-          ============================== */}
+          {/* UNKNOWN */}
 
           <Route
             path="*"
@@ -282,6 +260,15 @@ function App() {
 
 
         </Routes>
+
+
+
+        {/* =================================
+            GLOBAL CHATBOT
+        ================================= */}
+
+        <Chatbot />
+
 
       </AuthProvider>
 

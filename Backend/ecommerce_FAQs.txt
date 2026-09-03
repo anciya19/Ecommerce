@@ -1,0 +1,312 @@
+SHOPNOW E-COMMERCE SUPPORT INFORMATION
+
+ABOUT SHOPNOW
+
+ShopNow is an e-commerce website where users can browse products, filter products by category and subcategory, add products to a shopping cart, place orders, and view previous orders.
+
+ShopNow has three account roles:
+
+1. User
+2. Seller
+3. Admin
+
+
+USER REGISTRATION
+
+A new customer can create an account using the Register page.
+
+The customer enters:
+
+Name
+Email
+Password
+
+Passwords are securely hashed before being saved in the database.
+
+A normal registered customer has the role:
+
+user
+
+
+LOGIN
+
+Users, sellers, and administrators use the same login page.
+
+The website uses JWT authentication with an HTTP-only cookie.
+
+After successful login, the user remains logged in when the browser page is refreshed until the authentication session expires or the user logs out.
+
+
+PRODUCTS
+
+Customers can view products from the Products page.
+
+Products contain:
+
+Product name
+Description
+Price
+Stock
+Category
+Subcategory
+Product image
+
+
+PRODUCT CATEGORIES
+
+The main categories are:
+
+Electronics
+Fashion
+Home & Kitchen
+
+
+ELECTRONICS SUBCATEGORIES
+
+Electronics contains:
+
+Mobiles
+Laptops
+Headphones
+Cameras
+Accessories
+
+
+FASHION SUBCATEGORIES
+
+Fashion contains:
+
+Dresses
+Pants
+Shirts
+Shoes
+Bags
+
+
+HOME AND KITCHEN SUBCATEGORIES
+
+Home & Kitchen contains:
+
+Kitchen
+Furniture
+Appliances
+Home Decor
+
+
+PRODUCT FILTERING
+
+Clicking Electronics displays Electronics products.
+
+Clicking Fashion displays Fashion products.
+
+Clicking Home & Kitchen displays Home & Kitchen products.
+
+Customers can also filter using subcategories.
+
+For example:
+
+Fashion > Dresses displays only Fashion products in the Dresses subcategory.
+
+Fashion > Pants displays only Fashion products in the Pants subcategory.
+
+Electronics > Mobiles displays only Electronics products in the Mobiles subcategory.
+
+
+PRODUCT SEARCH
+
+Customers can search products from the Products page.
+
+The search can match product name, description, category, and subcategory.
+
+
+SHOPPING CART
+
+Customers can add available products to the shopping cart.
+
+The cart belongs to the logged-in user.
+
+Customers can:
+
+Add products
+Increase quantity
+Decrease quantity
+Remove products
+
+Customers cannot order more items than the available stock.
+
+
+CHECKOUT
+
+Customers can proceed from the Cart page to Checkout.
+
+The Checkout page shows:
+
+Products
+Quantities
+Prices
+Total amount
+
+
+PAYMENT OPTIONS
+
+The project supports:
+
+Cash on Delivery
+
+Card Payment Demo
+
+The Card Payment option is currently a demonstration option.
+
+The application does not store raw card numbers or CVV information.
+
+
+PLACE ORDER
+
+To place an order:
+
+1. Add products to the shopping cart.
+2. Open the Cart page.
+3. Check product quantities.
+4. Click Proceed to Checkout.
+5. Select a payment method.
+6. Click Place Order.
+
+After the order is placed:
+
+An order is created.
+Order items are created.
+Product stock is reduced.
+The shopping cart is cleared.
+The order appears in Order History.
+
+
+ORDER HISTORY
+
+Customers can view previous orders from the Orders page.
+
+Order history can show:
+
+Order ID
+Order date
+Product name
+Quantity
+Price
+Total amount
+Payment method
+Payment status
+Order status
+
+
+BECOME A SELLER
+
+A normal user can become a seller.
+
+The user clicks:
+
+Become a Seller
+
+The Seller Registration page collects:
+
+Seller name
+Shop name
+Phone number
+
+The existing user account is reused.
+
+After successful registration, the user's role changes from:
+
+user
+
+to:
+
+seller
+
+
+SELLER DASHBOARD
+
+A seller can manage their own products from the Seller Dashboard.
+
+The seller can:
+
+Add products
+View products
+Edit products
+Delete products
+View customer orders related to their products
+
+
+SELLER PRODUCT CREATION
+
+When adding a product, the seller enters:
+
+Product name
+Description
+Price
+Stock
+Category
+Subcategory
+Image URL
+
+The category is selected from a dropdown.
+
+The subcategory options depend on the selected category.
+
+
+SELLER OWNERSHIP
+
+A seller can only edit or delete their own products.
+
+The seller ID is not accepted directly from the frontend.
+
+FastAPI obtains the seller ID from the authenticated seller using JWT authentication.
+
+
+SELLER ORDERS
+
+When a customer orders a seller's product, the seller can view the order details in the Seller Dashboard.
+
+Seller order information can include:
+
+Order ID
+Customer name
+Customer email
+Product name
+Quantity
+Price
+Subtotal
+Payment method
+Payment status
+Order status
+Order date
+
+
+ADMIN
+
+The administrator can manage products.
+
+The admin can:
+
+Add products
+View products
+Edit products
+Delete products
+
+Admin APIs are protected using role-based authentication.
+
+
+LOGOUT
+
+Users, sellers, and administrators can log out.
+
+Logout removes the authentication cookie and clears the React authentication state.
+
+
+CHATBOT
+
+The ShopNow chatbot answers questions about how to use the ShopNow e-commerce website.
+
+The chatbot must answer only using the ShopNow support information in this file.
+
+If information is not available in this file, the chatbot should answer:
+
+"The answer is not available in the provided file."
