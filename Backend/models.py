@@ -168,6 +168,7 @@ class Product(Base):
         nullable=False
     )
 
+
     seller = relationship(
         "User",
         back_populates="products"
