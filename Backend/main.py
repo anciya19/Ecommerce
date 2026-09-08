@@ -13,7 +13,10 @@ from routers import (
     auth,
     products,
     sellers,
-    chatbot
+    chatbot,
+    cart,
+    orders,
+    admin
 )
 
 
@@ -26,10 +29,13 @@ Base.metadata.create_all(
 )
 
 
+# =========================================
+# CREATE FASTAPI APP
+# =========================================
+
 app = FastAPI(
 
-    title=
-        "ShopNow E-commerce API",
+    title="ShopNow E-commerce API",
 
     version="2.0.0"
 
@@ -62,25 +68,71 @@ app.add_middleware(
 
 
 # =========================================
-# ROUTERS
+# AUTH ROUTER
 # =========================================
 
 app.include_router(
     auth.router
 )
 
+
+# =========================================
+# CHATBOT ROUTER
+# =========================================
+
 app.include_router(
     chatbot.router
 )
+
+
+# =========================================
+# PRODUCTS ROUTER
+# =========================================
 
 app.include_router(
     products.router
 )
 
+
+# =========================================
+# SELLERS ROUTER
+# =========================================
+
 app.include_router(
     sellers.router
 )
 
+
+# =========================================
+# CART ROUTER
+# =========================================
+
+app.include_router(
+    cart.router
+)
+
+
+# =========================================
+# ORDERS ROUTER
+# =========================================
+
+app.include_router(
+    orders.router
+)
+
+
+# =========================================
+# ADMIN ROUTER
+# =========================================
+
+app.include_router(
+    admin.router
+)
+
+
+# =========================================
+# HOME
+# =========================================
 
 @app.get("/")
 def home():
@@ -89,5 +141,22 @@ def home():
 
         "message":
             "E-commerce API running"
+
+    }
+
+
+# =========================================
+# HEALTH CHECK
+# =========================================
+
+@app.get("/health")
+def health_check():
+
+    return {
+
+        "status": "ok",
+
+        "message":
+            "ShopNow backend is running"
 
     }

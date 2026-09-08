@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import (
     BaseModel,
-    EmailStr,
     ConfigDict,
+    EmailStr,
     Field
 )
 
@@ -19,12 +20,12 @@ class UserCreate(BaseModel):
     email: EmailStr
 
     password: str = Field(
-        min_length=8
+        min_length=6
     )
 
 
 # =========================================================
-# LOGIN
+# USER LOGIN
 # =========================================================
 
 class LoginRequest(BaseModel):
@@ -48,30 +49,40 @@ class UserResponse(BaseModel):
 
     role: str
 
+
     model_config = ConfigDict(
         from_attributes=True
     )
 
 
 # =========================================================
-# SELLER
+# SELLER REGISTER
 # =========================================================
 
 class SellerRegister(BaseModel):
 
-    seller_name: str = Field(
-        min_length=2,
-        max_length=100
-    )
+    shop_name: str
 
-    shop_name: str = Field(
-        min_length=2,
-        max_length=255
-    )
+    phone_number: str
 
-    phone_number: str = Field(
-        min_length=5,
-        max_length=30
+
+# =========================================================
+# SELLER PROFILE RESPONSE
+# =========================================================
+
+class SellerProfileResponse(BaseModel):
+
+    id: int
+
+    user_id: int
+
+    shop_name: str
+
+    phone_number: str
+
+
+    model_config = ConfigDict(
+        from_attributes=True
     )
 
 
@@ -81,10 +92,7 @@ class SellerRegister(BaseModel):
 
 class ProductCreate(BaseModel):
 
-    name: str = Field(
-        min_length=1,
-        max_length=255
-    )
+    name: str
 
     description: str = ""
 
@@ -96,9 +104,7 @@ class ProductCreate(BaseModel):
         ge=0
     )
 
-    category: str = Field(
-        min_length=1
-    )
+    category: str
 
     subcategory: Optional[str] = None
 
@@ -117,15 +123,9 @@ class ProductUpdate(BaseModel):
 
     description: Optional[str] = None
 
-    price: Optional[float] = Field(
-        default=None,
-        gt=0
-    )
+    price: Optional[float] = None
 
-    stock: Optional[int] = Field(
-        default=None,
-        ge=0
-    )
+    stock: Optional[int] = None
 
     category: Optional[str] = None
 
@@ -160,8 +160,146 @@ class ProductResponse(BaseModel):
 
     seller_id: Optional[int] = None
 
-    is_deal: bool
+    is_deal: bool = False
+
 
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
+# =========================================================
+# CART - ADD PRODUCT
+# =========================================================
+
+class CartAdd(BaseModel):
+
+    product_id: int
+
+    quantity: int = Field(
+        default=1,
+        ge=1
+    )
+
+
+# =========================================================
+# CART - UPDATE QUANTITY
+# =========================================================
+
+class CartUpdate(BaseModel):
+
+    quantity: int = Field(
+        ge=1
+    )
+
+
+# =========================================================
+# CART ITEM RESPONSE
+# =========================================================
+
+class CartItemResponse(BaseModel):
+
+    id: int
+
+    product_id: int
+
+    quantity: int
+
+    product: ProductResponse
+
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+
+
+# =========================================================
+# CART COUNT RESPONSE
+# =========================================================
+
+class CartCountResponse(BaseModel):
+
+    count: int
+
+
+# =========================================================
+# PLACE ORDER REQUEST
+# =========================================================
+
+class PlaceOrderRequest(BaseModel):
+
+    payment_method: str
+
+
+# =========================================================
+# ORDER ITEM RESPONSE
+# =========================================================
+
+class OrderItemResponse(BaseModel):
+
+    id: int
+
+    product_id: int
+
+    seller_id: Optional[int] = None
+
+    product_name: str
+
+    quantity: int
+
+    unit_price: float
+
+    subtotal: float
+
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+
+
+# =========================================================
+# ORDER RESPONSE
+# =========================================================
+
+class OrderResponse(BaseModel):
+
+    id: int
+
+    user_id: int
+
+    total_amount: float
+
+    payment_method: str
+
+    payment_status: str
+
+    order_status: str
+
+    created_at: datetime
+
+    items: list[
+        OrderItemResponse
+    ]
+
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+
+
+# =========================================================
+# ADMIN - UPDATE ORDER STATUS
+# =========================================================
+
+class OrderStatusUpdate(BaseModel):
+
+    order_status: str
+
+
+# =========================================================
+# ADMIN - UPDATE PAYMENT STATUS
+# =========================================================
+
+class PaymentStatusUpdate(BaseModel):
+
+    payment_status: str

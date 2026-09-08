@@ -5,7 +5,10 @@ from fastapi import (
     Response
 )
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import (
+    Session,
+    joinedload
+)
 
 from database import get_db
 
@@ -21,6 +24,7 @@ from auth import (
 
 import crud
 import schemas
+import models
 
 
 router = APIRouter(
@@ -29,32 +33,25 @@ router = APIRouter(
 )
 
 
-# =========================================
+# =========================================================
 # BECOME SELLER
-# =========================================
+# =========================================================
 
 @router.post("/register")
 def register_seller(
-    seller_data:
-        schemas.SellerRegister,
+    seller_data: schemas.SellerRegister,
     response: Response,
-    current_user=Depends(
-        get_current_user
-    ),
-    db: Session = Depends(
-        get_db
-    )
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
 
-    # Only a normal customer can
-    # become a seller.
+    # Only normal users can become sellers.
 
     if current_user.role == "admin":
 
         raise HTTPException(
             status_code=403,
-            detail=
-                "Admin accounts cannot become seller accounts"
+            detail="Admin accounts cannot become seller accounts"
         )
 
 
@@ -62,8 +59,7 @@ def register_seller(
 
         raise HTTPException(
             status_code=400,
-            detail=
-                "You already have a seller account"
+            detail="You already have a seller account"
         )
 
 
@@ -71,16 +67,13 @@ def register_seller(
 
         raise HTTPException(
             status_code=403,
-            detail=
-                "Only normal user accounts can become sellers"
+            detail="Only normal user accounts can become sellers"
         )
 
 
-    existing_profile = (
-        crud.get_seller_profile(
-            db,
-            current_user.id
-        )
+    existing_profile = crud.get_seller_profile(
+        db,
+        current_user.id
     )
 
 
@@ -88,34 +81,24 @@ def register_seller(
 
         raise HTTPException(
             status_code=400,
-            detail=
-                "Seller profile already exists"
+            detail="Seller profile already exists"
         )
 
 
-    seller_profile = (
-        crud.upgrade_user_to_seller(
-
-            db,
-
-            current_user,
-
-            seller_data
-
-        )
+    seller_profile = crud.upgrade_user_to_seller(
+        db,
+        current_user,
+        seller_data
     )
 
 
-    # -------------------------------------
+    # =====================================================
     # CREATE NEW JWT WITH SELLER ROLE
-    # -------------------------------------
+    # =====================================================
 
     token = create_access_token(
-
         user_id=current_user.id,
-
         role="seller"
-
     )
 
 
@@ -126,21 +109,13 @@ def register_seller(
 
 
     response.set_cookie(
-
         key="access_token",
-
         value=token,
-
         httponly=True,
-
         secure=False,
-
         samesite="lax",
-
         max_age=max_age,
-
         path="/"
-
     )
 
 
@@ -181,25 +156,19 @@ def register_seller(
     }
 
 
-# =========================================
+# =========================================================
 # SELLER PROFILE
-# =========================================
+# =========================================================
 
 @router.get("/profile")
 def seller_profile(
-    seller=Depends(
-        require_seller
-    ),
-    db: Session = Depends(
-        get_db
-    )
+    seller=Depends(require_seller),
+    db: Session = Depends(get_db)
 ):
 
-    profile = (
-        crud.get_seller_profile(
-            db,
-            seller.id
-        )
+    profile = crud.get_seller_profile(
+        db,
+        seller.id
     )
 
 
@@ -207,8 +176,7 @@ def seller_profile(
 
         raise HTTPException(
             status_code=404,
-            detail=
-                "Seller profile not found"
+            detail="Seller profile not found"
         )
 
 
@@ -235,9 +203,9 @@ def seller_profile(
     }
 
 
-# =========================================
+# =========================================================
 # SELLER PRODUCTS
-# =========================================
+# =========================================================
 
 @router.get(
     "/products",
@@ -246,75 +214,51 @@ def seller_profile(
     ]
 )
 def seller_products(
-    seller=Depends(
-        require_seller
-    ),
-    db: Session = Depends(
-        get_db
-    )
+    seller=Depends(require_seller),
+    db: Session = Depends(get_db)
 ):
 
-    return (
-        crud.get_seller_products(
-            db,
-            seller.id
-        )
+    return crud.get_seller_products(
+        db,
+        seller.id
     )
 
 
-# =========================================
+# =========================================================
 # CREATE SELLER PRODUCT
-# =========================================
+# =========================================================
 
 @router.post(
     "/products",
-    response_model=
-        schemas.ProductResponse,
+    response_model=schemas.ProductResponse,
     status_code=201
 )
 def create_product(
-    product:
-        schemas.ProductCreate,
-    seller=Depends(
-        require_seller
-    ),
-    db: Session = Depends(
-        get_db
-    )
+    product: schemas.ProductCreate,
+    seller=Depends(require_seller),
+    db: Session = Depends(get_db)
 ):
 
-    return (
-        crud.create_seller_product(
-
-            db,
-
-            product,
-
-            seller.id
-
-        )
+    return crud.create_seller_product(
+        db,
+        product,
+        seller.id
     )
 
 
-# =========================================
+# =========================================================
 # UPDATE SELLER PRODUCT
-# =========================================
+# =========================================================
 
 @router.put(
     "/products/{product_id}",
-    response_model=
-        schemas.ProductResponse
+    response_model=schemas.ProductResponse
 )
 def update_product(
     product_id: int,
-    product_data:
-        schemas.ProductUpdate,
-    seller=Depends(
-        require_seller
-    ),
-    db: Session = Depends(
-        get_db
-    )
+    product_data: schemas.ProductUpdate,
+    seller=Depends(require_seller),
+    db: Session = Depends(get_db)
 ):
 
     product = crud.get_product(
@@ -331,46 +275,34 @@ def update_product(
         )
 
 
-    if (
-        product.seller_id
-        != seller.id
-    ):
+    # Seller can update only their own product.
+
+    if product.seller_id != seller.id:
 
         raise HTTPException(
             status_code=403,
-            detail=
-                "You can only update your own products"
+            detail="You can only update your own products"
         )
 
 
-    return (
-        crud.update_seller_product(
-
-            db,
-
-            product,
-
-            product_data
-
-        )
+    return crud.update_seller_product(
+        db,
+        product,
+        product_data
     )
 
 
-# =========================================
+# =========================================================
 # DELETE SELLER PRODUCT
-# =========================================
+# =========================================================
 
 @router.delete(
     "/products/{product_id}"
 )
 def delete_product(
     product_id: int,
-    seller=Depends(
-        require_seller
-    ),
-    db: Session = Depends(
-        get_db
-    )
+    seller=Depends(require_seller),
+    db: Session = Depends(get_db)
 ):
 
     product = crud.get_product(
@@ -387,15 +319,13 @@ def delete_product(
         )
 
 
-    if (
-        product.seller_id
-        != seller.id
-    ):
+    # Seller can delete only their own product.
+
+    if product.seller_id != seller.id:
 
         raise HTTPException(
             status_code=403,
-            detail=
-                "You can only delete your own products"
+            detail="You can only delete your own products"
         )
 
 
@@ -406,8 +336,129 @@ def delete_product(
 
 
     return {
-
         "message":
             "Product deleted successfully"
-
     }
+
+
+# =========================================================
+# SELLER ORDERS
+# =========================================================
+
+@router.get("/orders")
+def seller_orders(
+    seller=Depends(require_seller),
+    db: Session = Depends(get_db)
+):
+
+    # -----------------------------------------------------
+    # IMPORTANT
+    #
+    # seller.id comes from the authenticated JWT user.
+    #
+    # We DO NOT accept seller_id from React.
+    #
+    # This prevents one seller from requesting another
+    # seller's order information.
+    # -----------------------------------------------------
+
+    order_items = (
+
+        db.query(models.OrderItem)
+
+        .join(
+            models.Order,
+            models.Order.id
+            ==
+            models.OrderItem.order_id
+        )
+
+        .options(
+            joinedload(
+                models.OrderItem.order
+            ).joinedload(
+                models.Order.user
+            )
+        )
+
+        .filter(
+            models.OrderItem.seller_id
+            ==
+            seller.id
+        )
+
+        .order_by(
+            models.Order.created_at.desc()
+        )
+
+        .all()
+
+    )
+
+
+    result = []
+
+
+    for item in order_items:
+
+        order = item.order
+
+        customer = order.user
+
+
+        result.append({
+
+            "order_item_id":
+                item.id,
+
+            "order_id":
+                order.id,
+
+            "order_date":
+                order.created_at,
+
+            "customer": {
+
+                "id":
+                    customer.id,
+
+                "name":
+                    customer.name,
+
+                "email":
+                    customer.email
+
+            },
+
+            "product": {
+
+                "product_id":
+                    item.product_id,
+
+                "product_name":
+                    item.product_name,
+
+                "quantity":
+                    item.quantity,
+
+                "unit_price":
+                    item.unit_price,
+
+                "subtotal":
+                    item.subtotal
+
+            },
+
+            "payment_method":
+                order.payment_method,
+
+            "payment_status":
+                order.payment_status,
+
+            "order_status":
+                order.order_status
+
+        })
+
+
+    return result

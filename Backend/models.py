@@ -1,10 +1,14 @@
+from datetime import datetime
+
 from sqlalchemy import (
+    Boolean,
     Column,
+    DateTime,
+    Float,
+    ForeignKey,
     Integer,
     String,
-    Float,
-    Boolean,
-    ForeignKey
+    UniqueConstraint,
 )
 
 from sqlalchemy.orm import relationship
@@ -52,12 +56,25 @@ class User(Base):
     seller_profile = relationship(
         "SellerProfile",
         back_populates="user",
-        uselist=False
+        uselist=False,
+        cascade="all, delete-orphan"
     )
 
     products = relationship(
         "Product",
         back_populates="seller"
+    )
+
+    cart_items = relationship(
+        "CartItem",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    orders = relationship(
+        "Order",
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
 
 
@@ -168,8 +185,191 @@ class Product(Base):
         nullable=False
     )
 
-
     seller = relationship(
         "User",
         back_populates="products"
+    )
+
+    cart_items = relationship(
+        "CartItem",
+        back_populates="product"
+    )
+
+
+# =========================================================
+# CART ITEM
+# =========================================================
+
+class CartItem(Base):
+
+    __tablename__ = "cart_items"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "product_id",
+            name="uq_cart_user_product"
+        ),
+    )
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    product_id = Column(
+        Integer,
+        ForeignKey(
+            "products.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    quantity = Column(
+        Integer,
+        default=1,
+        nullable=False
+    )
+
+    user = relationship(
+        "User",
+        back_populates="cart_items"
+    )
+
+    product = relationship(
+        "Product",
+        back_populates="cart_items"
+    )
+
+
+# =========================================================
+# ORDER
+# =========================================================
+
+class Order(Base):
+
+    __tablename__ = "orders"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    total_amount = Column(
+        Float,
+        nullable=False
+    )
+
+    payment_method = Column(
+        String(50),
+        nullable=False
+    )
+
+    payment_status = Column(
+        String(50),
+        default="pending",
+        nullable=False
+    )
+
+    order_status = Column(
+        String(50),
+        default="placed",
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    user = relationship(
+        "User",
+        back_populates="orders"
+    )
+
+    items = relationship(
+        "OrderItem",
+        back_populates="order",
+        cascade="all, delete-orphan"
+    )
+
+
+# =========================================================
+# ORDER ITEM
+# =========================================================
+
+class OrderItem(Base):
+
+    __tablename__ = "order_items"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    order_id = Column(
+        Integer,
+        ForeignKey(
+            "orders.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    product_id = Column(
+        Integer,
+        nullable=False
+    )
+
+    seller_id = Column(
+        Integer,
+        nullable=True
+    )
+
+    product_name = Column(
+        String(255),
+        nullable=False
+    )
+
+    quantity = Column(
+        Integer,
+        nullable=False
+    )
+
+    unit_price = Column(
+        Float,
+        nullable=False
+    )
+
+    subtotal = Column(
+        Float,
+        nullable=False
+    )
+
+    order = relationship(
+        "Order",
+        back_populates="items"
     )
